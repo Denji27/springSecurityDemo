@@ -12,6 +12,6 @@ public interface UserService {
     public AuthenticationResponse register(RegisterRequest registerRequest);
     public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest);
     public List<User> showAllUser();
-
+    public String assignAsUser(String email);
     public AuthenticationResponse createAdmin(RegisterRequest registerRequest);
 }

@@ -24,4 +24,10 @@ public class UserController1 {
         return ResponseEntity.ok("Hello");
     }
 
+    @PostMapping("/assign-as-user")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> assignAsUser(@RequestBody Email email){
+        return ResponseEntity.ok(userService.assignAsUser(email.getEmail()));
+    }
+
 }

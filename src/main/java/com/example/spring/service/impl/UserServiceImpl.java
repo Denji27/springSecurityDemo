@@ -63,6 +63,22 @@ public class UserServiceImpl implements UserService{
         return userRepository.findAll();
     }
 
+    @Override
+    public String assignAsUser(String email) {
+        for(User user : userRepository.findAll()){
+            if(user.getUsername()==email){
+                if(user.getRole()==Role.NONE){
+                    user.setRole(Role.USER);
+                    return "This user " + user.getUsername() + " has been officially assigned as an USER";
+                }
+                else{
+                    return "This user " + user.getUsername() + " has a specific role already";
+                }
+            }
+        }
+        return "The email is not verified";
+    }
+
 
     @Override
     public AuthenticationResponse createAdmin(RegisterRequest registerRequest) {
