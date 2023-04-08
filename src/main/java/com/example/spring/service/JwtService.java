@@ -18,8 +18,11 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
-    @Value("${time}")
-    private String value;
+
+    @Value("${jwtExpiration}")
+    private long jwtExpiration;
+    @Value("${refreshExpiration}")
+    private long refreshExpiration;
     private static final String SECRET_KEY = "367639792442264529482B4D6251655468576D5A7134743777217A25432A462D";
 
     public String extractEmail(String jwt){
@@ -34,8 +37,9 @@ public class JwtService {
 
     public Claims extractAllClaims(String jwt){
         return Jwts
-                .parser()
+                .parserBuilder()
                 .setSigningKey(getSignInKey())
+                .build()
                 .parseClaimsJws(jwt)
                 .getBody();
     }
@@ -58,19 +62,23 @@ public class JwtService {
         return extractClaim(jwt, Claims::getExpiration);
     }
 
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails){
+    public String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration){
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis()+ 60 * 1000 *Integer.parseInt(value)))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(SignatureAlgorithm.HS256, getSignInKey())
                 .compact();
     }
 
     public String generateToken(UserDetails userDetails){
-        return generateToken(new HashMap<>(), userDetails);
+        return buildToken(new HashMap<>(), userDetails, jwtExpiration);
+    }
+
+    public String generateRefreshToken(UserDetails userDetails) {
+        return buildToken(new HashMap<>(), userDetails, refreshExpiration);
     }
 
 }
